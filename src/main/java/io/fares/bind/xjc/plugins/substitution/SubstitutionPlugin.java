@@ -48,8 +48,11 @@ import org.jvnet.jaxb2_commons.plugin.AbstractParameterizablePlugin;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 
+// REVIEW AV: You don't need AbstractParameterizablePlugin if you dont't accept parameters from command line (you don't)
 public class SubstitutionPlugin extends AbstractParameterizablePlugin {
 
+	// REVIEW AV: Better use your own namespace and put some documentation there
+	// Some people look for schema documentation at the NS URI.
   public static final String NS = "http://jaxb2-commons.dev.java.net/basic/substitution";
 
   public static final String SUBSTITUTION_HEAD = "head";
@@ -87,6 +90,7 @@ public class SubstitutionPlugin extends AbstractParameterizablePlugin {
 
   private void postProcessClassInfo(final Model model, final CClassInfo classInfo) {
 
+	  // REVIEW AV: Why do you need this? This does not do anything.
     classInfo.accept(new CClassInfoParent.Visitor<Void>() {
 
       @Override
@@ -120,6 +124,7 @@ public class SubstitutionPlugin extends AbstractParameterizablePlugin {
           }
 
           if (isCandidate) {
+        	  // REVIEW AV: Don't get this - why this call?
             element.getAdapter();
           }
 
@@ -192,6 +197,7 @@ public class SubstitutionPlugin extends AbstractParameterizablePlugin {
                                                          final CElementInfo elementInfo,
                                                          final CCustomizations customizations) {
 
+	  // REVIEW AV: Shouldn't you create CReferencePropertyInfo if you want @XmlElementRef annotation?
     final CElementPropertyInfo elementPropertyInfo = new CElementPropertyInfo(
       property.getName(false),
       property.isCollection() ? CollectionMode.REPEATED_ELEMENT : CollectionMode.NOT_REPEATED,
@@ -233,6 +239,9 @@ public class SubstitutionPlugin extends AbstractParameterizablePlugin {
       // find our plugin customization and swap @XmlElement for @XmlElementRef
       for (FieldOutline fieldOutline : classOutline.getDeclaredFields()) {
 
+    	  // REVIEW AV: This does not feel quite right. You create a CElementPropertyInfo property
+    	  // but then hack it to use another annotation. This is not good since your generated code does
+    	  // not represent your model anymore. This may cause problem to other tools/plugins.
         CPropertyInfo propertyInfo = fieldOutline.getPropertyInfo();
 
         // check field property customization
